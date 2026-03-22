@@ -1,0 +1,33 @@
+# Patterns
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Charts and reports (generated)
+*.png
+*.html
+!README.md
+
+# Environment
+.env
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Memory files (contain user-specific data)
+# Uncomment these if you don't want to commit your memory files:
+# .copilot/memory.json
+# .copilot/CONTEXT.md

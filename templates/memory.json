@@ -1,0 +1,65 @@
+{
+  "_description": "Persistent machine-readable memory for AI coding sessions. Copy to .copilot/memory.json and fill in your values.",
+  "_updated": "YYYY-MM-DDTHH:MM:SSZ",
+
+  "tools_installed": {
+    "analyze": "tools/analyze.py — DuckDB queries, charts, JSON diff, HTML reports",
+    "context7": "tools/context7.py — real-time library docs via Context7 MCP",
+    "mslearn": "tools/mslearn.py — official MS Learn docs via HTTP MCP",
+    "duckdb": "pip: duckdb (version)"
+  },
+
+  "workspaces": {
+    "my_workspace": {
+      "id": "YOUR-WORKSPACE-GUID-HERE",
+      "note": "Description of this workspace"
+    }
+  },
+
+  "lakehouses": {
+    "my_lakehouse": {
+      "workspace": "my_workspace",
+      "sql_endpoint": "YOUR-ENDPOINT.datawarehouse.fabric.microsoft.com",
+      "schemas": {
+        "dbo": "Description of tables in dbo schema"
+      }
+    }
+  },
+
+  "warehouses": {
+    "my_warehouse": {
+      "workspace": "my_workspace",
+      "sql_endpoint": "YOUR-ENDPOINT.datawarehouse.fabric.microsoft.com",
+      "note": "Description"
+    }
+  },
+
+  "api_patterns": {
+    "fabric_base": "https://api.fabric.microsoft.com/v1",
+    "token_audiences": {
+      "fabric": "https://api.fabric.microsoft.com",
+      "powerbi": "https://analysis.windows.net/powerbi/api",
+      "onelake": "https://storage.azure.com"
+    },
+    "gotchas": [
+      "Add hard-won API lessons here so you don't re-learn them",
+      "Example: updateDefinition requires ALL files, not partial",
+      "Example: 202 responses have literal 'null' as body text"
+    ]
+  },
+
+  "preferences": {
+    "ask_user_before_acting": true,
+    "backup_before_changes": true,
+    "one_step_at_a_time": true
+  },
+
+  "experiment_results": {
+    "_note": "Record key findings so the assistant doesn't re-run them",
+    "example_experiment": {
+      "date": "YYYY-MM-DD",
+      "result": "description of what was learned",
+      "verdict": "keep / revert / investigate further"
+    }
+  }
+}
