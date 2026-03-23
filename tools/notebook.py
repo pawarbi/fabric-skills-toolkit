@@ -82,17 +82,37 @@ def poll_lro(url: str, token: str, label: str = "operation", max_wait: int = 300
 # ── Format Conversion ──────────────────────────────────────────────────────
 
 def ipynb_to_fabric_source(nb: dict) -> str:
-    """Convert .ipynb JSON to Fabric notebook-content.py source format."""
+    """Convert .ipynb JSON to Fabric notebook-content.py source format.
+
+    Supports both Python (jupyter) and PySpark (synapse_pyspark) notebooks.
+    Non-default-language cells (%%tsql, %%sql, %%spark, %%html) get # MAGIC prefix.
+    """
     lines = ["# Fabric notebook source", "", "# METADATA ********************", ""]
-    nb_meta = {
-        "kernel_info": {"name": "jupyter", "jupyter_kernel_name": "python3.11"},
-        "dependencies": {
+
+    # Detect kernel from notebook metadata
+    kernel_name = nb.get("metadata", {}).get("kernel_info", {}).get("name", "jupyter")
+    if kernel_name == "synapse_pyspark":
+        language_group = "synapse_pyspark"
+    else:
+        kernel_name = "jupyter"
+        language_group = "jupyter_python"
+
+    # Build notebook-level metadata, preserving dependencies if present
+    nb_meta = {"kernel_info": {"name": kernel_name}}
+    if kernel_name == "jupyter":
+        nb_meta["kernel_info"]["jupyter_kernel_name"] = "python3.11"
+
+    deps = nb.get("metadata", {}).get("dependencies", {})
+    if deps:
+        nb_meta["dependencies"] = deps
+    else:
+        nb_meta["dependencies"] = {
             "lakehouse": {
                 "default_lakehouse_name": "",
                 "default_lakehouse_workspace_id": "",
             }
-        },
-    }
+        }
+
     for ml in json.dumps(nb_meta, indent=2).split("\n"):
         lines.append("# META " + ml)
 
@@ -106,10 +126,23 @@ def ipynb_to_fabric_source(nb: dict) -> str:
         elif cell["cell_type"] == "code":
             lines.append("# CELL ********************")
             lines.append("")
-            for line in "".join(cell.get("source", [])).split("\n"):
-                lines.append(line)
+
+            cell_source = "".join(cell.get("source", []))
+            cell_lang = cell.get("metadata", {}).get("microsoft", {}).get("language", "python")
+            source_lines = cell_source.split("\n")
+
+            # Detect magic commands: %%tsql, %%sql, %%spark, %%html
+            uses_magic = len(source_lines) > 0 and source_lines[0].startswith("%%")
+
+            if uses_magic:
+                for line in source_lines:
+                    lines.append("# MAGIC " + line)
+            else:
+                for line in source_lines:
+                    lines.append(line)
+
             lines.extend(["", "# METADATA ********************", ""])
-            cell_meta = {"language": "python", "language_group": "jupyter_python"}
+            cell_meta = {"language": cell_lang, "language_group": language_group}
             for ml in json.dumps(cell_meta, indent=2).split("\n"):
                 lines.append("# META " + ml)
     lines.append("")
@@ -117,27 +150,36 @@ def ipynb_to_fabric_source(nb: dict) -> str:
 
 
 def fabric_source_to_cells(content: str) -> list:
-    """Parse Fabric notebook-content.py into a list of cell dicts."""
-    lines = content.split("\n")
+    """Parse Fabric notebook-content.py into a list of cell dicts.
+
+    Handles # MAGIC prefixed lines for multi-language cells.
+    Returns cells with type, content, and language fields.
+    """
+    source_lines = content.split("\n")
     cells = []
     i = 0
 
-    while i < len(lines):
-        line = lines[i].rstrip()
+    # Detect kernel from notebook-level metadata
+    notebook_language_group = "jupyter_python"
+    for line in source_lines[:50]:
+        if '"synapse_pyspark"' in line:
+            notebook_language_group = "synapse_pyspark"
+            break
+
+    while i < len(source_lines):
+        line = source_lines[i].rstrip()
 
         if line == "# MARKDOWN ********************":
             i += 1
-            # Skip blank line after marker
-            if i < len(lines) and lines[i].strip() == "":
+            if i < len(source_lines) and source_lines[i].strip() == "":
                 i += 1
             md_lines = []
-            while i < len(lines):
-                cur = lines[i].rstrip()
+            while i < len(source_lines):
+                cur = source_lines[i].rstrip()
                 if cur.startswith("# CELL ********************") or cur.startswith("# MARKDOWN ********************"):
                     break
                 if cur.startswith("# META ") or cur == "# METADATA ********************":
                     break
-                # Strip the "# " prefix
                 if cur.startswith("# "):
                     md_lines.append(cur[2:])
                 elif cur == "#":
@@ -145,37 +187,60 @@ def fabric_source_to_cells(content: str) -> list:
                 else:
                     md_lines.append(cur)
                 i += 1
-            # Remove trailing empty lines
             while md_lines and md_lines[-1] == "":
                 md_lines.pop()
             cells.append({"type": "markdown", "content": "\n".join(md_lines)})
 
         elif line == "# CELL ********************":
             i += 1
-            if i < len(lines) and lines[i].strip() == "":
+            if i < len(source_lines) and source_lines[i].strip() == "":
                 i += 1
             code_lines = []
-            while i < len(lines):
-                cur = lines[i].rstrip()
+            cell_language = "python"
+            has_magic = False
+
+            while i < len(source_lines):
+                cur = source_lines[i].rstrip()
                 if cur == "# METADATA ********************":
-                    # Skip metadata block
+                    # Parse cell metadata to get language
                     i += 1
-                    while i < len(lines):
-                        if lines[i].rstrip().startswith("# META "):
+                    meta_json_lines = []
+                    while i < len(source_lines):
+                        mline = source_lines[i].rstrip()
+                        if mline.startswith("# META "):
+                            meta_json_lines.append(mline[7:])
                             i += 1
-                        elif lines[i].strip() == "":
+                        elif mline.strip() == "":
                             i += 1
                         else:
                             break
+                    if meta_json_lines:
+                        try:
+                            meta = json.loads("\n".join(meta_json_lines))
+                            cell_language = meta.get("language", "python")
+                        except json.JSONDecodeError:
+                            pass
                     break
                 if cur.startswith("# CELL ********************") or cur.startswith("# MARKDOWN ********************"):
                     break
-                code_lines.append(cur)
+                # Strip # MAGIC prefix
+                if cur.startswith("# MAGIC "):
+                    code_lines.append(cur[8:])
+                    has_magic = True
+                elif cur == "# MAGIC":
+                    code_lines.append("")
+                    has_magic = True
+                else:
+                    code_lines.append(cur)
                 i += 1
-            # Remove trailing empty lines
+
             while code_lines and code_lines[-1] == "":
                 code_lines.pop()
-            cells.append({"type": "code", "content": "\n".join(code_lines)})
+            cells.append({
+                "type": "code",
+                "content": "\n".join(code_lines),
+                "language": cell_language,
+            })
         else:
             i += 1
 

@@ -213,3 +213,82 @@ for line in cell["source"]:
 for line in "".join(cell["source"]).split("\n"):
     output.append(line)
 ```
+
+## Multi-Language Cells (# MAGIC prefix)
+
+Both Python (jupyter) and PySpark (synapse_pyspark) notebooks support cells
+in languages other than the default. These cells use magic commands (`%%`)
+and are stored with a `# MAGIC` prefix on every line in Fabric source format.
+
+### Available magic commands by kernel
+
+| Kernel | Magic | Language | Cell metadata language |
+|--------|-------|----------|----------------------|
+| jupyter | `%%tsql` | T-SQL | `"python"` (or `"sql"`) |
+| synapse_pyspark | `%%sql` | Spark SQL | `"sparksql"` |
+| synapse_pyspark | `%%spark` | Scala | `"scala"` |
+| synapse_pyspark | `%%html` | HTML | `"html"` |
+
+Note: `%%tsql` is only available in Python (jupyter) notebooks. `%%sql`, `%%spark`,
+and `%%html` are only available in PySpark (synapse_pyspark) notebooks.
+
+### Example: Spark SQL cell in PySpark notebook
+
+```python
+# CELL ********************
+
+# MAGIC %%sql
+# MAGIC select * from my_table
+
+# METADATA ********************
+
+# META {
+# META   "language": "sparksql",
+# META   "language_group": "synapse_pyspark"
+# META }
+```
+
+### Example: T-SQL cell in Python notebook
+
+```python
+# CELL ********************
+
+# MAGIC %%tsql -artifact my_lakehouse -type Lakehouse
+# MAGIC
+# MAGIC SELECT * FROM [dbo].[my_table]
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "jupyter_python"
+# META }
+```
+
+### PySpark notebook-level metadata
+
+PySpark notebooks use `synapse_pyspark` as the kernel name and typically
+include lakehouse bindings in dependencies:
+
+```python
+# META {
+# META   "kernel_info": {
+# META     "name": "synapse_pyspark"
+# META   },
+# META   "dependencies": {
+# META     "lakehouse": {
+# META       "default_lakehouse": "abc-123",
+# META       "default_lakehouse_name": "my_lakehouse",
+# META       "default_lakehouse_workspace_id": "xyz-456",
+# META       "known_lakehouses": [
+# META         {
+# META           "id": "abc-123"
+# META         }
+# META       ]
+# META     },
+# META     "warehouse": {
+# META       "known_warehouses": []
+# META     }
+# META   }
+# META }
+```
