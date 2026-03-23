@@ -8,9 +8,20 @@ A standalone skill collection that gives AI coding assistants (GitHub Copilot, C
 
 ## Quick Start
 
-### Install
+### Install as Plugin (GitHub Copilot CLI)
+
+```
+/plugin marketplace add pawarbi/fabric-skills-toolkit
+/plugin install fabric-notebook-toolkit@fabric-skills-toolkit
+```
+
+### Install Manually
 
 ```powershell
+# Clone and install
+git clone https://github.com/pawarbi/fabric-skills-toolkit.git
+cd fabric-skills-toolkit
+
 # Windows
 .\install.ps1
 

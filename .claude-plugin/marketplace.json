@@ -1,0 +1,21 @@
+{
+  "name": "fabric-skills-toolkit",
+  "metadata": {
+    "description": "Skills and tools for AI-assisted Microsoft Fabric notebook development",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "fabric-notebook-toolkit",
+      "description": "Complete bundle: notebook CRUD, workspace context, and agent",
+      "version": "1.0.0",
+      "skills": [
+        "./skills/notebook-authoring-cli",
+        "./skills/workspace-context-cli"
+      ],
+      "agents": [
+        "./agents/FabricNotebookDev.agent.md"
+      ]
+    }
+  ]
+}
