@@ -141,14 +141,64 @@ python tools/workspace_context.py --help
 
 ### MCP Integrations
 
-The toolkit includes Python wrappers for two MCP servers and documents setup for the official Fabric MCP. See [docs/mcp-integration-guide.md](docs/mcp-integration-guide.md) for full details.
+The toolkit includes Python wrappers for two MCP servers and documents setup for the official Fabric and Power BI MCPs. See [docs/mcp-integration-guide.md](docs/mcp-integration-guide.md) for full setup details.
 
 | MCP Server | Included | What it provides |
 |-----------|----------|-----------------|
 | MS Learn (`mslearn.py`) | Yes - Python wrapper | Search and fetch Microsoft Learn docs (Fabric, Power BI, Spark). Public HTTP endpoint, no setup needed |
 | Context7 (`context7.py`) | Yes - Python wrapper | Up-to-date docs for any library. Requires Node.js for npx |
-| [Fabric/OneLake MCP](https://github.com/microsoft/mcp) | Referenced - separate install | 21+ tools for OneLake operations (list workspaces, upload/download files, list tables, get schemas). Official Microsoft MCP server |
-| [Power BI Query MCP](https://api.fabric.microsoft.com/v1/mcp/powerbi) | Referenced | Execute DAX/SQL queries against Power BI datasets. Used by skills-for-fabric |
+| [Fabric/OneLake MCP](https://github.com/microsoft/mcp) | Separate install (.NET) | 21+ tools for OneLake operations. Official Microsoft MCP server |
+| [Power BI Query MCP](https://api.fabric.microsoft.com/v1/mcp/powerbi) | Separate install | Execute DAX/SQL queries against Power BI semantic models |
+
+#### Fabric/OneLake MCP - what it adds
+
+The [official Fabric MCP server](https://github.com/microsoft/mcp) is a .NET server that gives AI assistants direct access to OneLake and Fabric metadata. It complements this toolkit: the toolkit handles notebook CRUD and workspace context, while the Fabric MCP handles file-level OneLake operations and item discovery.
+
+**Key tools it provides:**
+
+| Tool | Example use case |
+|------|-----------------|
+| `list_workspaces` | AI discovers all workspaces you have access to without you looking up IDs |
+| `list_items` | AI lists all lakehouses, warehouses, pipelines in a workspace |
+| `list_tables` | AI sees all tables in a lakehouse and their schemas |
+| `get_table` | AI previews table data and column types before writing queries |
+| `upload_file` / `download_file` | AI uploads CSV/Parquet to OneLake Files or downloads results |
+| `best-practices` | AI gets Fabric best practices docs in context |
+
+**Example workflow combining toolkit + Fabric MCP:**
+
+```
+1. AI reads WORKSPACE-CONTEXT       (this toolkit)  -> knows workspace conventions, project context
+2. AI calls list_tables              (Fabric MCP)    -> sees current lakehouse schema
+3. AI writes a transformation notebook               -> uses correct table names, follows conventions
+4. AI calls notebook.py create       (this toolkit)  -> uploads notebook to Fabric
+5. AI calls upload_file              (Fabric MCP)    -> uploads reference data to OneLake Files
+6. AI calls notebook.py execute      (this toolkit)  -> runs the notebook
+```
+
+**Setup** (requires .NET SDK):
+
+```bash
+git clone https://github.com/microsoft/mcp.git
+cd mcp/servers/Fabric.Mcp.Server/src
+dotnet build -c Release
+```
+
+Uses your Azure CLI token (`az login`) for auth.
+
+#### Power BI Query MCP - what it adds
+
+The Power BI MCP endpoint lets AI assistants execute DAX and SQL queries directly against semantic models. Useful for validating data, testing measures, or exploring model structure without leaving the AI session.
+
+```
+# AI can run DAX queries like:
+EVALUATE TOPN(10, 'Sales', 'Sales'[Amount], DESC)
+
+# Or SQL queries:
+SELECT TOP 10 * FROM Sales ORDER BY Amount DESC
+```
+
+Used by [microsoft/skills-for-fabric](https://github.com/microsoft/skills-for-fabric) for Power BI development workflows.
 
 ### Agent
 
