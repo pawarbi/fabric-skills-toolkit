@@ -18,7 +18,7 @@ fabmcp onelake list_workspaces
 az rest --method GET \
   --url "https://api.fabric.microsoft.com/v1/workspaces" \
   --resource "https://api.fabric.microsoft.com" \
-  | python -c "import sys,json; [print(f'{w[\"id\"]} → {w[\"displayName\"]}') for w in json.load(sys.stdin)['value']]"
+  | python -c "import sys,json; [print(f'{w[\"id\"]} -> {w[\"displayName\"]}') for w in json.load(sys.stdin)['value']]"
 ```
 
 ### Step 2: List Items
@@ -128,7 +128,7 @@ python tools/analyze.py diff query_v1.sql query_v2.sql --type text
 
 ```bash
 python tools/context7.py search "azure identity"
-# → Returns: /azure/azure-identity
+# -> Returns: /azure/azure-identity
 ```
 
 ### Step 2: Get Specific Docs
@@ -136,14 +136,14 @@ python tools/context7.py search "azure identity"
 ```bash
 python tools/context7.py docs "/azure/azure-identity" \
   --topic "DefaultAzureCredential managed identity"
-# → Returns current documentation with code examples
+# -> Returns current documentation with code examples
 ```
 
 ### Step 3: Cross-Reference with MS Learn
 
 ```bash
 python tools/mslearn.py search "managed identity fabric workspace"
-# → Returns official Microsoft docs for Fabric + managed identity
+# -> Returns official Microsoft docs for Fabric + managed identity
 ```
 
 ---
@@ -213,7 +213,7 @@ Report.from_data("Experiment Results", [
       "date": "2025-03-22",
       "experiment": "structured_headers_v3",
       "accuracy": "96.7%",
-      "verdict": "keep — best result so far"
+      "verdict": "keep - best result so far"
     }
   }
 }

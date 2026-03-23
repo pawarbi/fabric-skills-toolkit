@@ -1,5 +1,5 @@
 """
-Context7 MCP Wrapper — fetch real-time library docs from the CLI.
+Context7 MCP Wrapper - fetch real-time library docs from the CLI.
 
 Spawns the Context7 MCP server (npx @upstash/context7-mcp) as a subprocess,
 communicates via JSON-RPC over stdio, and exposes CLI commands:

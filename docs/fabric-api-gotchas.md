@@ -1,4 +1,4 @@
-# Fabric API Gotchas — Hard-Won Lessons
+# Fabric API Gotchas - Hard-Won Lessons
 
 > These discoveries came from 36+ real sessions working with Fabric REST APIs. Each one caused at least one debugging session. Save yourself the pain.
 
@@ -12,18 +12,18 @@ Many Fabric APIs use Long Running Operations (LRO). The pattern is:
 
 ```
 Step 1: POST /workspaces/{id}/items/{id}/getDefinition
-        → 202 Accepted
-        → Location: https://api.fabric.microsoft.com/v1/operations/{op-id}
+        -> 202 Accepted
+        -> Location: https://api.fabric.microsoft.com/v1/operations/{op-id}
 
 Step 2: GET {Location URL}          ← Poll this repeatedly
-        → 200 OK
-        → {"status": "Running"}     ← Keep polling
+        -> 200 OK
+        -> {"status": "Running"}     ← Keep polling
         ...
-        → {"status": "Succeeded"}   ← Done! But...
+        -> {"status": "Succeeded"}   ← Done! But...
 
 Step 3: GET {Location URL}/result   ← MUST call this!
-        → 200 OK
-        → {"definition": {"parts": [...]}}   ← Actual data
+        -> 200 OK
+        -> {"definition": {"parts": [...]}}   ← Actual data
 ```
 
 **The trap**: When polling returns `"status": "Succeeded"`, the response body contains ONLY the status. The actual payload requires one more GET request to `{Location URL}/result`.
@@ -42,7 +42,7 @@ def poll_lro(poll_url: str, headers: dict, timeout: int = 120) -> dict:
         status = body.get("status", "")
         
         if status == "Succeeded":
-            # Don't return body — it has no payload!
+            # Don't return body - it has no payload!
             result_resp = requests.get(f"{poll_url}/result", headers=headers)
             return result_resp.json()
         elif status in ("Failed", "Cancelled"):
@@ -57,17 +57,17 @@ def poll_lro(poll_url: str, headers: dict, timeout: int = 120) -> dict:
 
 ## 2. The `null` Body Trap
 
-When a Fabric API returns `202 Accepted`, the response body is literally the string `"null"` — not an empty string, not `{}`, but the four characters n-u-l-l.
+When a Fabric API returns `202 Accepted`, the response body is literally the string `"null"` - not an empty string, not `{}`, but the four characters n-u-l-l.
 
 ```python
 # What you get:
-resp.text  # → '"null"' (the string, including quotes)
-resp.text  # → 'null'   (sometimes without quotes)
+resp.text  # -> '"null"' (the string, including quotes)
+resp.text  # -> 'null'   (sometimes without quotes)
 
 # The trap:
 import json
-json.loads("null")  # → None (not an error!)
-json.loads("")      # → JSONDecodeError
+json.loads("null")  # -> None (not an error!)
+json.loads("")      # -> JSONDecodeError
 
 # Safe pattern:
 def safe_parse(body: str):
@@ -104,7 +104,7 @@ This isn't documented. If you use the wrong casing, you get a 404 with no helpfu
 
 ## 4. updateDefinition Requires ALL Files
 
-When updating an item's definition via the REST API, you must include **every** file in the definition — not just the ones you changed.
+When updating an item's definition via the REST API, you must include **every** file in the definition - not just the ones you changed.
 
 ```python
 # ❌ Wrong: Only sending the file you changed
@@ -184,9 +184,9 @@ az account get-access-token --resource "https://storage.azure.com" --query acces
 Not all workspaces are visible through all APIs:
 
 ```
-Fabric REST API:    GET /workspaces     → Shows workspaces you have access to
-OneLake DFS API:    filesystem list     → May show FEWER workspaces
-Fabric MCP Server:  list_workspaces     → Uses OneLake, same visibility as DFS
+Fabric REST API:    GET /workspaces     -> Shows workspaces you have access to
+OneLake DFS API:    filesystem list     -> May show FEWER workspaces
+Fabric MCP Server:  list_workspaces     -> Uses OneLake, same visibility as DFS
 ```
 
 If a workspace appears in the Fabric portal but not in OneLake API calls, it may be a capacity or permission issue. Personal workspaces and workspaces on shared capacity sometimes behave differently.
@@ -211,7 +211,7 @@ Fabric items have two states: **draft** and **published**. The REST API returns 
 **Rules:**
 - `getDefinition` returns both draft AND published files
 - `updateDefinition` must only include draft files
-- There is NO publish API — you must publish manually in the Fabric UI
+- There is NO publish API - you must publish manually in the Fabric UI
 - Draft and published configs can differ (that's the point)
 
 ---

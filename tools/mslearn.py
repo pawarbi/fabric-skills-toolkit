@@ -1,5 +1,5 @@
 """
-Microsoft Learn MCP Wrapper — fetch official MS docs from the CLI.
+Microsoft Learn MCP Wrapper - fetch official MS docs from the CLI.
 
 Uses the public MS Learn MCP HTTP endpoint (https://learn.microsoft.com/api/mcp).
 No authentication required. No external dependencies (Python stdlib only).

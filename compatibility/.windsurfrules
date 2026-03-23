@@ -1,0 +1,84 @@
+You have access to Fabric Skills Toolkit tools for managing Microsoft Fabric notebooks and workspace context via REST API.
+
+Authentication: Run `az login` before any operations. All API calls use Azure CLI tokens.
+
+---
+
+Notebook operations (tools/notebook.py):
+
+  List notebooks:
+    python tools/notebook.py list --workspace-id WS_ID
+    python tools/notebook.py list --workspace-id WS_ID --format json
+
+  Create a notebook:
+    python tools/notebook.py create --workspace-id WS_ID --name "My Notebook"
+    python tools/notebook.py create --workspace-id WS_ID --name "My Notebook" --from-file analysis.ipynb
+
+  Read notebook content:
+    python tools/notebook.py read --workspace-id WS_ID --notebook-id NB_ID
+    python tools/notebook.py read --workspace-id WS_ID --notebook-id NB_ID --format json
+    python tools/notebook.py read --workspace-id WS_ID --notebook-id NB_ID --format raw
+
+  Update notebook definition:
+    python tools/notebook.py update --workspace-id WS_ID --notebook-id NB_ID --from-file updated.ipynb
+    python tools/notebook.py update --workspace-id WS_ID --notebook-id NB_ID --from-file notebook-content.py --name "Renamed"
+
+  Execute a notebook:
+    python tools/notebook.py execute --workspace-id WS_ID --notebook-id NB_ID --wait
+    python tools/notebook.py execute --workspace-id WS_ID --notebook-id NB_ID --wait --timeout 600
+
+  Read formats: markdown (default, human-readable), json (structured cells), raw (Fabric source).
+
+---
+
+Workspace context operations (tools/workspace_context.py):
+
+  Deploy WORKSPACE-CONTEXT template:
+    python tools/workspace_context.py deploy --workspace-id WS_ID
+
+  Extract context as JSON:
+    python tools/workspace_context.py extract --workspace-id WS_ID --format json
+
+  Extract context as markdown:
+    python tools/workspace_context.py extract --workspace-id WS_ID --format markdown --output context.md
+
+  The WORKSPACE-CONTEXT notebook auto-discovers workspace items, schemas, and settings.
+  The extract command reads source cells, not execution output. Run the notebook first
+  to populate auto-discovery sections.
+
+---
+
+Rules:
+
+- Always authenticate via `az login` first.
+- Handle 202 LRO responses by polling the Location header until status is Succeeded, then fetch /result.
+- Use WORKSPACE-CONTEXT (all caps) as the notebook name for workspace context notebooks.
+- Notebook definitions use Fabric source format (notebook-content.py), not .ipynb.
+- Definition payloads require format: FabricGitSource with base64-encoded parts.
+- The .platform file logicalId must be "00000000-0000-0000-0000-000000000000".
+- Use jupyter/python3.11 kernel, not synapse_pyspark.
+- updateDefinition requires ALL files (notebook-content.py and .platform); no partial updates.
+- Only send draft/ files, not published/ files (causes 409 DuplicateDefinitionParts).
+- Do not hardcode notebook IDs; use the list command to discover them.
+
+---
+
+Gotchas:
+
+- sempy.fabric.list_items() returns title-case columns: Type, Display Name, Id, Description (not snake_case).
+- sempy.fabric.list_tables() has a known bug with schema-enabled lakehouses; use notebookutils.fs.ls() instead.
+- A 202 response body may be the literal string "null"; guard with body.strip() in ("", "null", '"null"') before parsing.
+- On Windows, use az.cmd not az for subprocess calls; the CLI detects os.name == "nt" and handles this automatically.
+- Workspace settings APIs may return 403 if the user lacks Admin permissions.
+- When converting .ipynb to Fabric source, join source lines with "".join(cell["source"]) then split on "\n" to avoid trailing blank comment lines.
+
+---
+
+Fabric source format markers (notebook-content.py):
+
+- First line: # Fabric notebook source
+- # METADATA ******************** - metadata block boundary
+- # META {json} - metadata lines (prefixed with # META )
+- # CELL ******************** - code cell boundary
+- # MARKDOWN ******************** - markdown cell boundary
+- # {text} - markdown content lines (prefixed with # )

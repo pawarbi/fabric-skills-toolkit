@@ -8,7 +8,7 @@
 
 A **skill** is a markdown file (`SKILL.md`) that teaches an AI coding assistant how to perform a specific task with Microsoft Fabric. Skills live in the `skills/` folder and are loaded into the assistant's context when triggered.
 
-Skills provide **knowledge and guidance** — not executable code. The AI generates code on-demand based on your guidance.
+Skills provide **knowledge and guidance** - not executable code. The AI generates code on-demand based on your guidance.
 
 ---
 
@@ -19,9 +19,9 @@ Skills provide **knowledge and guidance** — not executable code. The AI genera
 A skill should do one thing well. If your skill covers both "creating tables" AND "querying data", split it into authoring and consumption skills.
 
 ```
-✅ sqldw-authoring-cli    → CREATE, ALTER, INSERT, COPY INTO
-✅ sqldw-consumption-cli  → SELECT, explore, analyze
-❌ sqldw-everything-cli   → Too broad, poor routing
+✅ sqldw-authoring-cli    -> CREATE, ALTER, INSERT, COPY INTO
+✅ sqldw-consumption-cli  -> SELECT, explore, analyze
+❌ sqldw-everything-cli   -> Too broad, poor routing
 ```
 
 ### 2. Start With a Clear Description
@@ -29,14 +29,14 @@ A skill should do one thing well. If your skill covers both "creating tables" AN
 The YAML frontmatter `description` field is how the AI decides which skill to use. Make it specific:
 
 ```yaml
-# ✅ Good — specific, actionable, discoverable
+# ✅ Good - specific, actionable, discoverable
 description: >
   Execute authoring T-SQL (DDL, DML, data ingestion) against Microsoft Fabric
   Data Warehouse from CLI environments. Use when the user wants to:
   (1) create/alter tables, (2) insert/update data, (3) run COPY INTO.
   Triggers: "create table in warehouse", "insert data via T-SQL".
 
-# ❌ Bad — vague, no routing signals
+# ❌ Bad - vague, no routing signals
 description: >
   Help with Fabric Warehouse operations.
 ```
@@ -49,7 +49,7 @@ description: >
 
 ### 3. Use Must/Prefer/Avoid Sections
 
-These guide the AI's behavior — the most impactful part of a skill:
+These guide the AI's behavior - the most impactful part of a skill:
 
 ```markdown
 ### MUST DO
@@ -63,9 +63,9 @@ These guide the AI's behavior — the most impactful part of a skill:
 - Structured table output for results
 
 ### AVOID
-- ODBC sqlcmd (`/opt/mssql-tools/bin/sqlcmd`) — requires driver install
-- Hardcoded FQDNs — discover via REST API
-- DML on Lakehouse SQL Endpoint — it's read-only
+- ODBC sqlcmd (`/opt/mssql-tools/bin/sqlcmd`) - requires driver install
+- Hardcoded FQDNs - discover via REST API
+- DML on Lakehouse SQL Endpoint - it's read-only
 ```
 
 ### 4. Guidance Over Code Templates
@@ -98,7 +98,7 @@ Every token in a skill consumes the AI's context window:
 | < 5K | ✅ Ideal | Perfect size |
 | 5K-10K | ⚠️ OK | Review if everything is needed |
 | 10K-15K | ⚠️ Large | Move content to `common/` |
-| > 15K | 🚨 Too big | Must split or refactor |
+| > 15K |  Too big | Must split or refactor |
 
 ### 6. Reference, Don't Duplicate
 
@@ -106,13 +106,13 @@ Shared patterns (authentication, workspace discovery, REST API basics) belong in
 
 ```markdown
 ## Prerequisite Knowledge
-- [COMMON-CLI.md](../../common/COMMON-CLI.md) — Authentication patterns
-- [COMMON-CORE.md](../../common/COMMON-CORE.md) — Fabric REST API patterns
+- [COMMON-CLI.md](../../common/COMMON-CLI.md) - Authentication patterns
+- [COMMON-CORE.md](../../common/COMMON-CORE.md) - Fabric REST API patterns
 ```
 
 ### 7. Tag All Code Blocks
 
-Always specify the language for code blocks — it helps the AI generate the right kind of code:
+Always specify the language for code blocks - it helps the AI generate the right kind of code:
 
 ````markdown
 ```bash
@@ -190,7 +190,7 @@ description: >
   Triggers: "[phrase 1]", "[phrase 2]", "[phrase 3]".
 ---
 
-> **Update Check — ONCE PER SESSION (mandatory)**
+> **Update Check - ONCE PER SESSION (mandatory)**
 > The first time this skill is used in a session, run the **check-updates** skill
 > before proceeding. Skip if already done this session.
 
@@ -216,7 +216,7 @@ description: >
 
 ## [Topic Sections]
 
-[Your skill content — guidance, patterns, decision frameworks]
+[Your skill content - guidance, patterns, decision frameworks]
 
 ## Examples
 

@@ -1,4 +1,4 @@
-# Fabric Skills Toolkit — Python Dependencies
+# Fabric Skills Toolkit - Python Dependencies
 duckdb>=1.0.0
 matplotlib>=3.7.0
 pandas>=2.0.0

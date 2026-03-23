@@ -3,9 +3,9 @@
   "_updated": "YYYY-MM-DDTHH:MM:SSZ",
 
   "tools_installed": {
-    "analyze": "tools/analyze.py — DuckDB queries, charts, JSON diff, HTML reports",
-    "context7": "tools/context7.py — real-time library docs via Context7 MCP",
-    "mslearn": "tools/mslearn.py — official MS Learn docs via HTTP MCP",
+    "analyze": "tools/analyze.py - DuckDB queries, charts, JSON diff, HTML reports",
+    "context7": "tools/context7.py - real-time library docs via Context7 MCP",
+    "mslearn": "tools/mslearn.py - official MS Learn docs via HTTP MCP",
     "duckdb": "pip: duckdb (version)"
   },
 

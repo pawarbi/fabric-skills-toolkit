@@ -1,7 +1,7 @@
-# Fabric Skills Toolkit — Setup Script (Windows)
+# Fabric Skills Toolkit - Setup Script (Windows)
 # Run: .\setup.ps1
 
-Write-Host "🔧 Fabric Skills Toolkit Setup" -ForegroundColor Cyan
+Write-Host " Fabric Skills Toolkit Setup" -ForegroundColor Cyan
 Write-Host "================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -16,7 +16,7 @@ Write-Host "✅ Found $pyVersion" -ForegroundColor Green
 
 # Install Python dependencies
 Write-Host ""
-Write-Host "📦 Installing Python dependencies..." -ForegroundColor Yellow
+Write-Host " Installing Python dependencies..." -ForegroundColor Yellow
 pip install -q duckdb matplotlib pandas
 if ($LASTEXITCODE -eq 0) {
     Write-Host "✅ Python dependencies installed" -ForegroundColor Green
@@ -36,7 +36,7 @@ if ($node) {
 
 # Set up .copilot directory
 Write-Host ""
-Write-Host "📁 Setting up .copilot directory..." -ForegroundColor Yellow
+Write-Host " Setting up .copilot directory..." -ForegroundColor Yellow
 $copilotDir = Join-Path $env:USERPROFILE ".copilot"
 if (-not (Test-Path $copilotDir)) {
     New-Item -ItemType Directory -Path $copilotDir -Force | Out-Null
@@ -63,18 +63,18 @@ if (-not (Test-Path $contextDest)) {
 
 # Verify tools work
 Write-Host ""
-Write-Host "🧪 Verifying tools..." -ForegroundColor Yellow
+Write-Host " Verifying tools..." -ForegroundColor Yellow
 
 # Test DuckDB
 try {
     $result = python tools/analyze.py query "SELECT 'toolkit works!' AS status" 2>&1
     if ($result -match "toolkit works") {
-        Write-Host "✅ analyze.py (DuckDB) — working" -ForegroundColor Green
+        Write-Host "✅ analyze.py (DuckDB) - working" -ForegroundColor Green
     } else {
-        Write-Host "⚠️  analyze.py — unexpected output" -ForegroundColor Yellow
+        Write-Host "⚠️  analyze.py - unexpected output" -ForegroundColor Yellow
     }
 } catch {
-    Write-Host "❌ analyze.py — failed" -ForegroundColor Red
+    Write-Host "❌ analyze.py - failed" -ForegroundColor Red
 }
 
 # Test MS Learn
@@ -82,12 +82,12 @@ try {
     Write-Host "   Testing MS Learn docs (requires internet)..." -ForegroundColor Gray
     $result = python tools/mslearn.py tools 2>&1
     if ($result -match "microsoft_docs") {
-        Write-Host "✅ mslearn.py — working" -ForegroundColor Green
+        Write-Host "✅ mslearn.py - working" -ForegroundColor Green
     } else {
-        Write-Host "⚠️  mslearn.py — unexpected output" -ForegroundColor Yellow
+        Write-Host "⚠️  mslearn.py - unexpected output" -ForegroundColor Yellow
     }
 } catch {
-    Write-Host "❌ mslearn.py — failed" -ForegroundColor Red
+    Write-Host "❌ mslearn.py - failed" -ForegroundColor Red
 }
 
 # Summary

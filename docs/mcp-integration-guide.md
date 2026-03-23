@@ -9,8 +9,8 @@
 MCP is a standard protocol for connecting AI assistants to external tools and data sources. Instead of the AI generating commands for you to run, MCP servers let the AI execute operations directly.
 
 ```
-Without MCP:  AI → generates command → you copy-paste → terminal → results → you paste back
-With MCP:     AI → calls MCP tool → results → AI continues
+Without MCP:  AI -> generates command -> you copy-paste -> terminal -> results -> you paste back
+With MCP:     AI -> calls MCP tool -> results -> AI continues
 ```
 
 ---
@@ -47,9 +47,9 @@ dotnet build -c Release
 
 ### 2. MS Learn MCP (via wrapper)
 
-This toolkit includes `tools/mslearn.py` — a wrapper for the public MS Learn MCP endpoint.
+This toolkit includes `tools/mslearn.py` - a wrapper for the public MS Learn MCP endpoint.
 
-**No setup needed** — it's a public HTTP endpoint at `https://learn.microsoft.com/api/mcp`.
+**No setup needed** - it's a public HTTP endpoint at `https://learn.microsoft.com/api/mcp`.
 
 **Tools:**
 
@@ -61,7 +61,7 @@ This toolkit includes `tools/mslearn.py` — a wrapper for the public MS Learn M
 
 ### 3. Context7 MCP (via wrapper)
 
-This toolkit includes `tools/context7.py` — a wrapper for the Context7 MCP server.
+This toolkit includes `tools/context7.py` - a wrapper for the Context7 MCP server.
 
 **Requires:** Node.js 18+, npx
 
@@ -109,15 +109,15 @@ AI Tool  ⟷  HTTP POST  ⟷  https://learn.microsoft.com/api/mcp
 
 ### GitHub Copilot CLI
 
-Currently, Copilot CLI doesn't natively support MCP configuration. That's why this toolkit uses **Python wrappers** — the AI runs `python tools/mslearn.py search "query"` as a regular command.
+Currently, Copilot CLI doesn't natively support MCP configuration. That's why this toolkit uses **Python wrappers** - the AI runs `python tools/mslearn.py search "query"` as a regular command.
 
 To make this seamless, add to your custom instructions:
 
 ```markdown
 ## Available Tools
-- `python tools/mslearn.py search "query"` — search Microsoft docs
-- `python tools/context7.py docs "id" --topic "topic"` — library docs
-- `fabmcp onelake list_workspaces` — list Fabric workspaces
+- `python tools/mslearn.py search "query"` - search Microsoft docs
+- `python tools/context7.py docs "id" --topic "topic"` - library docs
+- `fabmcp onelake list_workspaces` - list Fabric workspaces
 ```
 
 ### Claude Code
@@ -141,7 +141,7 @@ Add to `.mcp.json` in your project root:
 
 ### Cursor / Windsurf
 
-Add MCP server configuration in Settings → MCP Servers:
+Add MCP server configuration in Settings -> MCP Servers:
 
 ```json
 {

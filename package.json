@@ -1,0 +1,16 @@
+{
+  "name": "fabric-skills-toolkit",
+  "version": "1.0.0",
+  "description": "AI coding assistant skills and tools for Microsoft Fabric notebook development",
+  "scripts": {
+    "install": "powershell -ExecutionPolicy Bypass -File install.ps1"
+  },
+  "keywords": [
+    "fabric",
+    "notebook",
+    "skills",
+    "copilot",
+    "ai"
+  ],
+  "license": "MIT"
+}

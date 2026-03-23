@@ -1,5 +1,5 @@
 """
-Analysis Toolkit — DuckDB + Visualization helpers for CLI workflows.
+Analysis Toolkit - DuckDB + Visualization helpers for CLI workflows.
 
 Usage from CLI:
     python tools/analyze.py query "SELECT * FROM 'data/sales.csv' LIMIT 10"
@@ -282,7 +282,7 @@ class Report:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Analysis Toolkit — DuckDB + Charts + Diff")
+    parser = argparse.ArgumentParser(description="Analysis Toolkit - DuckDB + Charts + Diff")
     sub = parser.add_subparsers(dest="command")
 
     q = sub.add_parser("query", help="Run a DuckDB SQL query")

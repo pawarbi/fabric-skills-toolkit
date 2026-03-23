@@ -14,7 +14,7 @@ After 36 sessions, I was spending the first 5-10 minutes of every session re-exp
 
 ## The Solution: Two Files
 
-### memory.json — Structured Data for Machine Lookups
+### memory.json - Structured Data for Machine Lookups
 
 ```json
 {
@@ -35,7 +35,7 @@ Your AI assistant reads this and immediately knows:
 - How to connect to SQL endpoints
 - What schemas exist
 
-### CONTEXT.md — Behavioral Guidance for the AI
+### CONTEXT.md - Behavioral Guidance for the AI
 
 ```markdown
 ## Preferences
@@ -147,7 +147,7 @@ my-fabric-project/.copilot/
 ```markdown
 ## Preferences
 - Always ask before acting on production resources
-- One step at a time — sequential, not batched
+- One step at a time - sequential, not batched
 - Show findings before implementing changes
 ```
 
@@ -156,7 +156,7 @@ my-fabric-project/.copilot/
 ```markdown
 ## Key Learnings
 1. Fabric LRO: after Succeeded, must GET {url}/result for actual data
-2. updateDefinition requires ALL files — no partial updates
+2. updateDefinition requires ALL files - no partial updates
 3. subprocess.run with shell=True breaks on Windows with special chars
 ```
 
@@ -164,8 +164,8 @@ my-fabric-project/.copilot/
 
 ```markdown
 ## Tools
-- `python tools/mslearn.py search "query"` — Microsoft docs
-- `sqlcmd -S endpoint -d db -G -Q "..."` — Direct SQL
+- `python tools/mslearn.py search "query"` - Microsoft docs
+- `sqlcmd -S endpoint -d db -G -Q "..."` - Direct SQL
 ```
 
 ---
@@ -200,9 +200,9 @@ Before starting work, load context from .copilot/memory.json and .copilot/CONTEX
 ## Maintenance Tips
 
 1. **Update after discoveries**: Found a new API quirk? Add it immediately
-2. **Prune stale data**: Old experiment results with wrong conclusions → remove them
+2. **Prune stale data**: Old experiment results with wrong conclusions -> remove them
 3. **Version control it**: Commit memory.json and CONTEXT.md so the team benefits
-4. **Keep it concise**: 50-100 lines in memory.json is ideal. Over 200 lines → prune
+4. **Keep it concise**: 50-100 lines in memory.json is ideal. Over 200 lines -> prune
 5. **Date your entries**: Add `"_updated": "2025-03-22"` so you know what's current
 
 ---
@@ -227,7 +227,7 @@ AI: "What tables are in dbo?"
 
 ```
 User: "Query my Fabric lakehouse"
-AI: [reads memory.json — knows workspace, endpoint, schemas, table names]
+AI: [reads memory.json - knows workspace, endpoint, schemas, table names]
 AI: "I see your sales lakehouse has 10 tables in dbo and 3 views in analytics. 
      What would you like to query?"
 ... 0 minutes wasted, start working immediately
