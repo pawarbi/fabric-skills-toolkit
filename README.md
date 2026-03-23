@@ -8,9 +8,29 @@ AI coding assistants are powerful but they start blind in Fabric workspaces. The
 
 This plugin solves that with two things:
 
-**1. WORKSPACE-CONTEXT notebook** - A notebook that lives in every workspace and builds a complete picture automatically. It calls the Fabric APIs to discover items, schemas, workspace settings, Spark configuration, and Git connection. Developers add curated sections for conventions, project mappings, architecture, and gotchas. The result: any AI assistant can read this one notebook and immediately know what's in the workspace, how things connect, and how the team works.
+**1. WORKSPACE-CONTEXT notebook** - A notebook that lives in every workspace and serves two purposes:
+
+- **For AI assistants**: It provides structured, machine-readable context (item IDs, schemas, settings, conventions) so the AI can start working immediately without discovery calls. The AI reads one notebook and knows everything about the workspace.
+- **For human developers**: It's a living document that the team edits directly in the Fabric workspace. Developers update project mappings, document gotchas as they find them, record architecture decisions, and maintain conventions. It travels with the workspace - when someone branches off, the context comes with them. When a new team member joins, they open it and see everything without asking anyone.
+
+The notebook auto-discovers what it can (items, schemas, Spark settings, Git connection) and leaves curated sections for the team to fill in (projects, conventions, architecture, gotchas, ownership).
 
 **2. CLI tools for notebook CRUD** - Instead of the AI (or the developer) manually constructing REST API calls, handling Fabric source format conversion, polling long-running operations, and debugging 202 responses, the tools handle all of that. `notebook.py` gives you list/read/create/update/execute in one command. `workspace_context.py` deploys the template and extracts context without running the notebook.
+
+### Workspace context vs repo context
+
+WORKSPACE-CONTEXT is not a replacement for repo-level context files (like `.github/copilot-instructions.md` in GitHub or similar files in ADO repos). They serve different levels:
+
+| | WORKSPACE-CONTEXT (workspace) | Repo context (GitHub/ADO) |
+|---|---|---|
+| **Lives in** | Fabric workspace (visible to all workspace users) | Git repo (visible to repo collaborators) |
+| **Scope** | One workspace - its items, schemas, settings, conventions | One codebase - its architecture, patterns, build/test/deploy |
+| **Updates** | Edited in Fabric UI, auto-discovers live metadata on each run | Edited in IDE, committed to version control |
+| **Audience** | Fabric developers + AI assistants working in that workspace | Code developers + AI assistants working in that repo |
+| **Travels with** | Workspace branches (Fabric "Branch out" feature) | Git branches |
+| **Examples** | "Lakehouse uses schema-enabled tables", "Gold layer naming: dim_*, fact_*" | "Run tests with pytest", "API routes follow REST conventions" |
+
+They complement each other. The repo context tells the AI how to write code. The workspace context tells the AI what's in the environment the code runs against. A developer working in Copilot CLI has repo context from the repo and can pull workspace context via `workspace_context.py extract`.
 
 ### What this means in practice
 
