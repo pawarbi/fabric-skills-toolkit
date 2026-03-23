@@ -131,10 +131,24 @@ python tools/workspace_context.py --help
 
 ### Tools (Python CLI)
 
-| Tool | Description |
-|------|-------------|
-| tools/notebook.py | Notebook CRUD - list, read, create, update, execute |
-| tools/workspace_context.py | Context deploy and extract |
+| Tool | What it does | Why it helps |
+|------|-------------|-------------|
+| notebook.py | List, read, create, update, execute Fabric notebooks | No manual REST calls, handles Fabric source format conversion and LRO polling automatically |
+| workspace_context.py | Deploy and extract WORKSPACE-CONTEXT notebooks | One command to deploy the template, one command to pull context - no browser needed |
+| analyze.py | Query CSV/JSON/Parquet with SQL, build charts | DuckDB lets you run SQL on local files without a database. Quick data exploration and validation without Spark |
+| mslearn.py | MCP wrapper for Microsoft Learn documentation | AI assistant gets Fabric/Power BI docs in context. Searches and fetches official docs without leaving the session |
+| context7.py | MCP wrapper for library documentation (Context7) | AI assistant gets up-to-date API references for any library (pandas, pyspark, sempy, etc.) |
+
+### MCP Integrations
+
+The toolkit includes Python wrappers for two MCP servers and documents setup for the official Fabric MCP. See [docs/mcp-integration-guide.md](docs/mcp-integration-guide.md) for full details.
+
+| MCP Server | Included | What it provides |
+|-----------|----------|-----------------|
+| MS Learn (`mslearn.py`) | Yes - Python wrapper | Search and fetch Microsoft Learn docs (Fabric, Power BI, Spark). Public HTTP endpoint, no setup needed |
+| Context7 (`context7.py`) | Yes - Python wrapper | Up-to-date docs for any library. Requires Node.js for npx |
+| [Fabric/OneLake MCP](https://github.com/microsoft/mcp) | Referenced - separate install | 21+ tools for OneLake operations (list workspaces, upload/download files, list tables, get schemas). Official Microsoft MCP server |
+| [Power BI Query MCP](https://api.fabric.microsoft.com/v1/mcp/powerbi) | Referenced | Execute DAX/SQL queries against Power BI datasets. Used by skills-for-fabric |
 
 ### Agent
 
@@ -292,8 +306,41 @@ For the full guide, see [docs/workspace-context-guide.md](docs/workspace-context
 ## Prerequisites
 
 - Python 3.x
-- Azure CLI (`az login`)
+- Azure CLI (`az login`) - required for Fabric API tools
+- Node.js 18+ (optional) - only needed for context7.py MCP wrapper
 - Access to a Fabric workspace
+
+The installer runs `pip install` for Python dependencies (duckdb, matplotlib, pandas).
+
+## Testing It
+
+After install, verify everything works:
+
+```bash
+# 1. Check tools are accessible
+python ~/.copilot/skills/fabric/tools/notebook.py --help
+python ~/.copilot/skills/fabric/tools/workspace_context.py --help
+
+# 2. Authenticate
+az login
+
+# 3. List notebooks in your workspace
+python ~/.copilot/skills/fabric/tools/notebook.py list --workspace-id YOUR_WS_ID
+
+# 4. Deploy WORKSPACE-CONTEXT to your workspace
+python ~/.copilot/skills/fabric/tools/workspace_context.py deploy --workspace-id YOUR_WS_ID
+
+# 5. Open the notebook in Fabric and run all cells
+
+# 6. Extract the populated context
+python ~/.copilot/skills/fabric/tools/workspace_context.py extract --workspace-id YOUR_WS_ID --format json
+
+# 7. Test the analysis tool
+python ~/.copilot/skills/fabric/tools/analyze.py query "SELECT 1+1 AS answer"
+
+# 8. Test MS Learn MCP
+python ~/.copilot/skills/fabric/tools/mslearn.py search "fabric lakehouse"
+```
 
 ## Cross-Tool Support
 
