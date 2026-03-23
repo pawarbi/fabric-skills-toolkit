@@ -1,6 +1,6 @@
 # Fabric Skills Toolkit
 
-Skills, tools, and agents for AI-assisted Microsoft Fabric notebook development. Python notebooks only (for now).
+Skills, tools, and agents for AI-assisted Microsoft Fabric notebook development. Supports both Python and PySpark notebooks, including multi-language cells (%%tsql, %%sql, %%spark, %%html).
 
 ## Why This Exists
 
@@ -86,7 +86,7 @@ Auto-discovered data goes stale as items are added, schemas change, and settings
 
 A standalone skill collection that gives AI coding assistants (GitHub Copilot, Claude, Cursor, Windsurf) the ability to work with Microsoft Fabric workspaces and notebooks. Follows the [microsoft/skills-for-fabric](https://github.com/microsoft/skills-for-fabric) pattern: SKILL.md files teach the AI what to do, Python CLI tools do the work, and an agent orchestrates end-to-end workflows.
 
-> **Note**: The WORKSPACE-CONTEXT notebook currently supports Python notebooks only. Scala/R/SQL notebook support may be added later.
+> **Note**: The WORKSPACE-CONTEXT notebook currently supports Python notebooks only. The `notebook.py` tool supports both Python and PySpark notebooks, including multi-language cells (%%tsql for Python, %%sql/%%spark/%%html for PySpark).
 
 ## Quick Start
 
@@ -133,7 +133,7 @@ python tools/workspace_context.py --help
 
 | Tool | What it does | Why it helps |
 |------|-------------|-------------|
-| notebook.py | List, read, create, update, execute Fabric notebooks | No manual REST calls, handles Fabric source format conversion and LRO polling automatically |
+| notebook.py | List, read, create, update, execute Fabric notebooks | No manual REST calls, handles Fabric source format conversion and LRO polling automatically. Supports Python and PySpark notebooks with multi-language cells (%%tsql, %%sql, %%spark, %%html) |
 | workspace_context.py | Deploy and extract WORKSPACE-CONTEXT notebooks | One command to deploy the template, one command to pull context - no browser needed |
 | analyze.py | Query CSV/JSON/Parquet with SQL, build charts | DuckDB lets you run SQL on local files without a database. Quick data exploration and validation without Spark |
 | mslearn.py | MCP wrapper for Microsoft Learn documentation | AI assistant gets Fabric/Power BI docs in context. Searches and fetches official docs without leaving the session |
@@ -246,6 +246,7 @@ python tools/notebook.py read --workspace-id WS_ID --notebook-id NB_ID --format 
 python tools/notebook.py create --workspace-id WS_ID --name "My Notebook"
 
 # Create from .ipynb file (auto-converts to Fabric source format)
+# Supports both Python and PySpark notebooks with multi-language cells
 python tools/notebook.py create --workspace-id WS_ID --name "My Notebook" --from-file analysis.ipynb
 
 # Update notebook definition from file
@@ -273,6 +274,19 @@ python tools/workspace_context.py extract --workspace-id WS_ID --format json
 # Extract context as markdown, save to file
 python tools/workspace_context.py extract --workspace-id WS_ID --format markdown --output context.md
 ```
+
+### Multi-Language Notebook Support
+
+The `notebook.py` converter auto-detects the notebook kernel and handles magic cells:
+
+| Kernel | Notebook type | Magic commands | Cell metadata language |
+|--------|--------------|----------------|----------------------|
+| `jupyter` | Python | `%%tsql` | `python` or `sql` |
+| `synapse_pyspark` | PySpark | `%%sql`, `%%spark`, `%%html` | `sparksql`, `scala`, `html` |
+
+When converting `.ipynb` to Fabric source format, cells with magic commands get the `# MAGIC` prefix on every line. The converter preserves lakehouse/warehouse dependencies and sets the correct per-cell language metadata.
+
+When reading notebooks from Fabric, the tool strips `# MAGIC` prefixes and returns cells with their language field so you can distinguish Python cells from SQL or Scala cells.
 
 ## WORKSPACE-CONTEXT Notebook
 
