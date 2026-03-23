@@ -1,10 +1,49 @@
 # Fabric Skills Toolkit
 
-Skills, tools, and agents for AI-assisted Microsoft Fabric notebook development.
+Skills, tools, and agents for AI-assisted Microsoft Fabric notebook development. Python notebooks only (for now).
+
+## Why This Exists
+
+AI coding assistants are powerful but they start blind in Fabric workspaces. They don't know what items exist, what IDs they have, what schemas the lakehouses use, what Spark runtime is configured, or what naming conventions the team follows. Every session starts with the developer manually feeding context or the AI making repeated API calls just to orient itself.
+
+This plugin solves that with two things:
+
+**1. WORKSPACE-CONTEXT notebook** - A notebook that lives in every workspace and builds a complete picture automatically. It calls the Fabric APIs to discover items, schemas, workspace settings, Spark configuration, and Git connection. Developers add curated sections for conventions, project mappings, architecture, and gotchas. The result: any AI assistant can read this one notebook and immediately know what's in the workspace, how things connect, and how the team works.
+
+**2. CLI tools for notebook CRUD** - Instead of the AI (or the developer) manually constructing REST API calls, handling Fabric source format conversion, polling long-running operations, and debugging 202 responses, the tools handle all of that. `notebook.py` gives you list/read/create/update/execute in one command. `workspace_context.py` deploys the template and extracts context without running the notebook.
+
+### What this means in practice
+
+Without this plugin, a typical AI-assisted session starts with:
+- "What's the workspace ID?" (developer looks it up)
+- "What notebooks exist?" (AI calls list API, parses response)
+- "What tables are in the lakehouse?" (AI calls another API)
+- "What naming convention do you use?" (developer explains again)
+- "What's the Spark runtime version?" (another API call)
+
+With this plugin:
+- AI reads WORKSPACE-CONTEXT and has the full picture: items, IDs, schemas, settings, conventions, project context
+- AI uses `notebook.py` to create/read/update/execute without manual REST calls
+- New developers open WORKSPACE-CONTEXT and see everything without asking anyone
+- Branched workspaces carry the context with them
+- UAT/PROD workspaces get context generated programmatically
+
+### How each component helps
+
+| Component | What it does |
+|-----------|-------------|
+| WORKSPACE-CONTEXT.ipynb | Auto-discovers items, schemas, settings. Captures conventions, projects, architecture. Outputs structured JSON for AI consumption. |
+| notebook.py | List, read, create, update, execute notebooks via CLI. Handles Fabric source format, LRO polling, auth. No manual REST calls. |
+| workspace_context.py | Deploy the template to any workspace. Extract context without running the notebook. |
+| Skills (SKILL.md) | Teach AI assistants the correct patterns: format conversion, API gotchas, naming conventions. |
+| FabricNotebookDev agent | Orchestrates skills for end-to-end workflows: setup workspace, create notebooks, read context. |
+| Compatibility files | Same capabilities in Claude, Cursor, Windsurf - not just Copilot. |
 
 ## What This Is
 
 A standalone skill collection that gives AI coding assistants (GitHub Copilot, Claude, Cursor, Windsurf) the ability to work with Microsoft Fabric workspaces and notebooks. Follows the [microsoft/skills-for-fabric](https://github.com/microsoft/skills-for-fabric) pattern: SKILL.md files teach the AI what to do, Python CLI tools do the work, and an agent orchestrates end-to-end workflows.
+
+> **Note**: The WORKSPACE-CONTEXT notebook currently supports Python notebooks only. Scala/R/SQL notebook support may be added later.
 
 ## Quick Start
 
