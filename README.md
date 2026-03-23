@@ -48,6 +48,29 @@ With this plugin:
 - Branched workspaces carry the context with them
 - UAT/PROD workspaces get context generated programmatically
 
+### One instruction to rule them all
+
+If every workspace has a WORKSPACE-CONTEXT notebook, developers only need one line in their repo-level instructions (e.g., `.github/copilot-instructions.md`):
+
+> Always read the WORKSPACE-CONTEXT notebook first before writing any Fabric code.
+
+That single instruction means the AI starts every session by pulling item IDs, schemas, settings, and conventions. No more "what's the workspace ID?", no more "what naming convention do you use?". The context is already there, maintained by the team, refreshed on each run.
+
+### Cross-workspace projects
+
+Many Fabric projects span multiple workspaces (ingestion, transformation, analytics, reporting). Each workspace has its own WORKSPACE-CONTEXT. The AI can extract context from all of them:
+
+```bash
+python tools/workspace_context.py extract --workspace-id INGEST_WS --format json --output ingest-context.json
+python tools/workspace_context.py extract --workspace-id ANALYTICS_WS --format json --output analytics-context.json
+```
+
+Now the AI has item IDs, schemas, and conventions for both workspaces. It can write code that creates cross-workspace shortcuts, references tables in other lakehouses, or builds pipelines that span environments - all without asking the developer to look up a single ID.
+
+### Freshness
+
+Auto-discovered data goes stale as items are added, schemas change, and settings are updated. The notebook records a `last_refreshed` UTC timestamp every time it runs, so both AI assistants and developers know how current the data is. If the context is weeks old, re-run the notebook or deploy fresh via pipeline.
+
 ### How each component helps
 
 | Component | What it does |
